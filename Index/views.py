@@ -1,8 +1,7 @@
 from django.shortcuts import render , get_object_or_404, redirect
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Usuario
-import json
+from .forms import UsuarioForm
 
 
 def index(request):
@@ -13,19 +12,14 @@ def index(request):
 
 @csrf_exempt
 def guardar_usuario(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        nombre = data.get("nombre")
-        cedula = data.get("cedula")
-
-        if nombre and cedula:
-            usuario = Usuario(nombre=nombre, cedula=cedula)
-            usuario.save()
-            usuarios = Usuario.objects.all()
-            return render(request, 'Home.html', {'usuarios': usuarios})
-
+    form = UsuarioForm(request.POST)
+    if form.is_valid():
+        form.save()
+        return redirect('index')
+    else:
+        form = UsuarioForm()
     usuarios = Usuario.objects.all()
-    return render(request, 'Home.html', {'usuarios': usuarios})
+    return render(request,'Registro.html',{'form':form,'usuarios':usuarios})
 
 
 
