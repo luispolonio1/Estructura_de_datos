@@ -5,6 +5,14 @@
     <title>Registros</title>
 </head>
 <body>
-<h2>aqui van todos los archivos de registros diarios</h2>
+{% if usuarios_atendidos %}
+    <ul>
+    {% for usuario in usuarios_atendidos %}
+        <li>{{ usuario.nombre }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No hay usuarios atendidos.</p>
+{% endif %}
 </body>
 </html>
