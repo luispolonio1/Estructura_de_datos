@@ -22,11 +22,12 @@ def guardar_usuario(request):
     return render(request,'Registro.html',{'form':form,'usuarios':usuarios})
 
 
-
-
-
 def eliminar_usuario(request, usuario_id):
     usuario = get_object_or_404(Usuario, id=usuario_id)
     usuario.delete()
     return redirect('index')
+
+
+def Registros_vistas(request):
+    return render(request, 'Registros.html')
 
