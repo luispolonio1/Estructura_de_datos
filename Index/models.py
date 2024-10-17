@@ -12,6 +12,15 @@ class Usuario(models.Model):
     def __str__(self):
         return f"{self.nombre} - {self.cedula} - {self.edad}"
 
+class RegistroHoy(models.Model):
+    fecha = models.DateField(default=datetime.now)
+    usuarios = models.ManyToManyField(Usuario, related_name='registro_diario')
+
+    def __str__(self):
+        return f"Registro de {self.fecha} - {self.usuarios.count()} usuarios"
+
+
+
 
 class UsuarioAtendido(models.Model):
     nombre = models.CharField(max_length=100)
