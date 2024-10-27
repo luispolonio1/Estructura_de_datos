@@ -3,11 +3,19 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Usuario,UsuarioAtendido,RegistroHoy
 from .forms import UsuarioForm
 from datetime import date
+from .Nodos import Lista_nodos
 @csrf_exempt
 def index(request):
-    usuarios = Usuario.objects.all()
-    ticket_actual = Usuario.objects.order_by('fecha_registro').first()
-    return render(request, 'Home.html', {'usuarios': usuarios,'ticket_actual': ticket_actual})
+        usuarios = Usuario.objects.all()
+        lista_nodos = Lista_nodos()
+        for usuario in usuarios:
+            lista_nodos.insertar_final_nodo(usuario)
+        ticket_actual = lista_nodos.obtener_y_eliminar_primero()
+        lista_nodos = lista_nodos.imprimir()
+
+        return render(request, 'Home.html', {'lista_nodos': lista_nodos,'ticket_actual': ticket_actual})
+    # usuarios = Usuario.objects.all()
+    # return render(request, 'Home.html', {'usuarios': usuarios,'ticket_actual': ticket_actual})
 
 
 
@@ -46,7 +54,7 @@ def eliminar_usuario(request, usuario_id):
 
 def atender_usuario(request):
     # Obtener el primer ticket no atendido (FIFO)
-    usuario = Usuario.objects.order_by('fecha_registro').filter(atendido=False).first()
+    usuario = Usuario.objects.order_by('fecha_registro').first()
 
     if usuario:
         # Crear un registro en la tabla `UsuarioAtendido`
@@ -72,7 +80,7 @@ def agregar_usuario_al_registro_diario(usuario):
 
 
 
-
+@csrf_exempt
 def ver_registros_diarios(request):
     # Obtener todos los registros diarios
     registros = RegistroHoy.objects.all().order_by('-fecha')# Ordena por fecha de forma descendente
@@ -80,11 +88,17 @@ def ver_registros_diarios(request):
     usuarios_atendidos = UsuarioAtendido.objects.filter(fecha_registro=hoy)
     return render(request, 'Registros.html', {'registros': registros,'usuarios_atendidos': usuarios_atendidos})
 
+
+
+@csrf_exempt
 def detalle_registro_diario(request, registro_id):
     hoy = date.today()
     # Obtener el registro diario específico
     registro = get_object_or_404(RegistroHoy, id=registro_id)
     usuarios_atendidos = UsuarioAtendido.objects.all()
     return render(request, 'detalle_registro_diario.html', {'registro': registro, 'usuarios_atendidos': usuarios_atendidos})
+
+
+
 
 

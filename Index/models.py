@@ -1,3 +1,4 @@
+from django.core.validators import MinLengthValidator
 from django.db import models
 from datetime import datetime
 
@@ -5,7 +6,7 @@ from datetime import datetime
 
 class Usuario(models.Model):
     nombre = models.CharField(max_length=50)
-    cedula = models.CharField(max_length=50)
+    cedula = models.CharField(max_length=12,validators=[MinLengthValidator(8)])
     edad = models.IntegerField(default=0)
     fecha_registro = models.DateField(default=datetime.now)
     atendido = models.BooleanField(default=False)
@@ -24,7 +25,7 @@ class RegistroHoy(models.Model):
 
 class UsuarioAtendido(models.Model):
     nombre = models.CharField(max_length=100)
-    cedula = models.CharField(max_length=11)
+    cedula = models.CharField(max_length=12,validators=[MinLengthValidator(8)])
     edad = models.IntegerField()
     fecha_registro = models.DateField(default=datetime.now)
 
