@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cargar archivo</title>
+</head>
+<body>
+<h1>Cargar archivo</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ forms.as_p }}
+        <button type="submit">Cargar CSV</button>
+     </form>
+     <form method="POST"  action="{% url 'ver_registros_diarios' %}">
+         {% csrf_token %}
+        <button type="submit" class="btn btn-primary" style="display: flex;justify-content: center;align-items: center">Volver</button>
+     </form>
+</body>
+</html>
