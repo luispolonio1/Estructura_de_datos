@@ -13,7 +13,7 @@
 <div class="flex-container" style="display: flex;align-items: center;height:100px;justify-content: space-between;width:99%;flex-direction:row;margin:10px" >
     <div class="container" style="width:80%;display:flex;align-items:center;justify-content:space-evenly;margin:10px">
     <div style="width:70%;height:100px;border-radius:20px;display: flex;align-items: center;justify-content:center;color: white;background-color: #2B2B2B;" >
-        {% if ticket_actual and ticket_actual.fecha_registro == fecha_registro%}
+        {% if ticket_actual and ticket_actual.fecha_registro == fecha_registro %}
                 <p>Ticket #{{ ticket_actual.data.id }} - {{ ticket_actual.data.nombre }} - {{ ticket_actual.data.cedula }}</p>
             {% else %}
                 <p>No hay tickets en espera</p>
@@ -64,7 +64,7 @@
         </thead>
         <tbody>
         {% for usuario in lista_nodos %}
-            {% if usuario.fecha_registro == fecha_registro %}
+            {% if usuario.fecha_registro%}
             <tr>
                <td>{{usuario.nombre}}</td>
                 <td>{{usuario.cedula}}</td>

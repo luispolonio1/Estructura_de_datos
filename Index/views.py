@@ -16,8 +16,10 @@ def index(request):
         lista_nodos = lista_nodos.imprimir()
 
         return render(request, 'Home.html', {'lista_nodos': lista_nodos,'ticket_actual': ticket_actual})
-    # usuarios = Usuario.objects.all()
-    # return render(request, 'Home.html', {'usuarios': usuarios,'ticket_actual': ticket_actual})
+
+
+
+
 
 
 
@@ -26,9 +28,7 @@ def guardar_usuario(request):
     if request.method == 'POST':
         form = UsuarioForm(request.POST)
         if form.is_valid():
-            usuario = form.save()
-            # Agregar el usuario al registro diario
-            agregar_usuario_al_registro_diario(usuario)
+            usuario = form.save()  # Crear solo la instancia de Usuario
             return redirect('index')
     else:
         form = UsuarioForm()
@@ -38,18 +38,20 @@ def guardar_usuario(request):
 
 
 
+
+
+
+
+
 def eliminar_usuario(request, usuario_id):
     usuario = get_object_or_404(Usuario, id=usuario_id)
     usuario.delete()
     return redirect('index')
 
-# @csrf_exempt
-# def Registros_vistas(request):
-#     # Obtener la lista de usuarios atendidos desde UsuarioAtendido
-#     usuarios_atendidos = UsuarioAtendido.objects.all()
-#
-#     # Renderizar una nueva plantilla para los usuarios atendidos
-#     return render(request, 'Registros.html', {'usuarios_atendidos': usuarios_atendidos})
+
+
+
+
 
 
 
@@ -71,14 +73,22 @@ def atender_usuario(request):
     return redirect('index')
 
 
-def agregar_usuario_al_registro_diario(usuario):
-    # Verificar si ya existe un registro para hoy
+
+
+
+
+
+def agregar_usuario_al_registro_diario(usuario_atendido):
     hoy = date.today()
     registro, creado = RegistroHoy.objects.get_or_create(fecha=hoy)
-
-    # Agregar el usuario al registro de hoy
-    registro.usuarios.add(usuario)
+    registro.usuarios.add(usuario_atendido)  # Agregar `UsuarioAtendido` al registro diario
     registro.save()
+
+
+
+
+
+
 
 
 
@@ -92,6 +102,11 @@ def ver_registros_diarios(request):
 
 
 
+
+
+
+
+
 @csrf_exempt
 def detalle_registro_diario(request, registro_id):
     # Obtener el registro diario específico
@@ -100,6 +115,12 @@ def detalle_registro_diario(request, registro_id):
     return render(request, 'detalle_registro_diario.html', {'registro': registro, 'usuarios_atendidos': usuarios_atendidos})
 
 
+
+
+
+
+
+@csrf_exempt
 def descargas(request, registro_id):
     if request.method == 'POST':
         # Obtener el registro del día
@@ -123,9 +144,15 @@ def descargas(request, registro_id):
         return response
 
 
+
+
+
+
+
+@csrf_exempt
 def cargar_datos(request):
     if request.method == 'POST':
-        forms= CSVUploadForm(request.POST, request.FILES)
+        forms = CSVUploadForm(request.POST, request.FILES)
         if forms.is_valid():
             archivo_csv = request.FILES['file']
             decoded_file = archivo_csv.read().decode('utf-8').splitlines()
@@ -141,17 +168,17 @@ def cargar_datos(request):
                 # Convertir la fecha del registro en formato DateField
                 fecha_registro = datetime.strptime(fecha_registro, '%Y-%m-%d').date()  # Ajusta el formato según tu CSV
 
-                # Crear y guardar cada Usuario
-                usuario = Usuario.objects.create(
+                # Crear y guardar cada UsuarioAtendido
+                usuario_atendido = UsuarioAtendido.objects.create(
                     nombre=nombre,
-                    cedula=cedula,
+                    cedula='0'+cedula,
                     edad=int(edad),
                     fecha_registro=fecha_registro
                 )
 
                 # Agregar el usuario al registro diario correspondiente
                 registro, creado = RegistroHoy.objects.get_or_create(fecha=fecha_registro)
-                registro.usuarios.add(usuario)
+                registro.usuarios.add(usuario_atendido)  # Asegúrate de que RegistroHoy acepta instancias de UsuarioAtendido
                 registro.save()
 
             return redirect('ver_registros_diarios')  # Redirige a una página de éxito o a la página principal
@@ -159,6 +186,7 @@ def cargar_datos(request):
         forms = CSVUploadForm()
 
     return render(request, 'cargar_csv.html', {'forms': forms})
+
 
 
 
