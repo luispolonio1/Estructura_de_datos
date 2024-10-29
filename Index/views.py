@@ -94,11 +94,15 @@ def agregar_usuario_al_registro_diario(usuario_atendido):
 
 @csrf_exempt
 def ver_registros_diarios(request):
-    # Obtener todos los registros diarios
-    registros = RegistroHoy.objects.all().order_by('-fecha')# Ordena por fecha de forma descendente
-    hoy = date.today()
-    usuarios_atendidos = UsuarioAtendido.objects.filter(fecha_registro=hoy)
-    return render(request, 'Registros.html', {'registros': registros,'usuarios_atendidos': usuarios_atendidos})
+        # Asegurarse de que haya un registro para hoy si se crea un objeto UsuarioAtendido hoy
+        hoy = date.today()
+        registro_hoy, created = RegistroHoy.objects.get_or_create(fecha=hoy)
+
+        # Obtener todos los registros diarios, ordenados por fecha en orden descendente
+        registros = RegistroHoy.objects.all().order_by('-fecha')
+        usuarios_atendidos = UsuarioAtendido.objects.filter(fecha_registro=hoy)
+
+        return render(request, 'Registros.html', {'registros': registros,'usuarios_atendidos': usuarios_atendidos})
 
 
 
