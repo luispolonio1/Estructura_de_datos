@@ -7,13 +7,6 @@ class Lista_nodos:
     def __init__(self):
         self.cabeza = None
 
-    # def Insertar_nodo(self,data):
-    #     Nuevo_nodo = Nodos(data)
-    #     if self.cabeza is None:
-    #         self.head = Nuevo_nodo
-    #         return
-    #     Nuevo_nodo.siguiente = self.cabeza
-    #     self.cabeza = Nuevo_nodo
 
     def insertar_final_nodo(self,data):
         nuevo_nodo = Nodos(data)
@@ -43,3 +36,19 @@ class Lista_nodos:
             actual_nodo = actual_nodo.siguiente
         print('none')
         return nodos
+
+    def buscar(self, filtro, valor):
+        resultados = []
+        actual = self.cabeza
+
+        while actual is not None:
+            # Accede a los atributos a través de actual.data
+            if (filtro == "nombre" and actual.data.nombre == valor) or \
+                    (filtro == "cedula" and actual.data.cedula == valor) or \
+                    (filtro == "edad" and actual.data.edad == int(valor)):
+                resultados.append(actual.data)
+                print("Usuario encontrado:", actual.data.nombre)
+
+            actual = actual.siguiente
+
+        return resultados

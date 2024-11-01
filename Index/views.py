@@ -6,18 +6,57 @@ from .forms import UsuarioForm ,CSVUploadForm
 from datetime import date,datetime
 from .Nodos import Lista_nodos
 import csv
+
+
+def iniciar_nodos():
+    usuarios = Usuario.objects.all()
+    lista_nodos = Lista_nodos()
+    for usuario in usuarios:
+        lista_nodos.insertar_final_nodo(usuario)
+    return lista_nodos
+
+
+
 @csrf_exempt
 def index(request):
-        usuarios = Usuario.objects.all()
-        lista_nodos = Lista_nodos()
-        for usuario in usuarios:
-            lista_nodos.insertar_final_nodo(usuario)
+        lista_nodos=iniciar_nodos()
+        criterio = request.GET.get('criterio', 'nombre')
         ticket_actual = lista_nodos.obtener_y_eliminar_primero()
-        lista_nodos = lista_nodos.imprimir()
 
-        return render(request, 'Home.html', {'lista_nodos': lista_nodos,'ticket_actual': ticket_actual})
+        # Obtener la lista de datos sin alterar los nodos en la estructura
+        lista_nodos_datos = lista_nodos.imprimir()
+
+        # Ordenar la lista extraída con Merge Sort basado en el criterio
+        lista_nodos_datos = merge_sort(lista_nodos_datos, criterio)
+
+        return render(request, 'Home.html',  {'lista_nodos_datos': lista_nodos_datos, 'ticket_actual': ticket_actual, 'criterio': criterio})
 
 
+def merge_sort(data_list, criterio):
+    """Aplica Merge Sort a la lista de datos extraídos de los nodos."""
+    if len(data_list) <= 1:
+        return data_list
+
+    # Dividir la lista en mitades
+    mid = len(data_list) // 2
+    left_half = merge_sort(data_list[:mid], criterio)
+    right_half = merge_sort(data_list[mid:], criterio)
+
+    return merge(left_half, right_half, criterio)
+
+
+def merge(left, right, criterio):
+    """Fusión de dos listas ordenadas para el Merge Sort."""
+    sorted_list = []
+    while left and right:
+        if getattr(left[0], criterio) <= getattr(right[0], criterio):
+            sorted_list.append(left.pop(0))
+        else:
+            sorted_list.append(right.pop(0))
+
+    # Agregar elementos restantes
+    sorted_list.extend(left if left else right)
+    return sorted_list
 
 
 
@@ -25,40 +64,27 @@ def index(request):
 
 @csrf_exempt
 def guardar_usuario(request):
-    if request.method == 'POST':
-        form = UsuarioForm(request.POST)
-        if form.is_valid():
-            usuario = form.save()  # Crear solo la instancia de Usuario
-            return redirect('index')
-    else:
-        form = UsuarioForm()
+        if request.method == 'POST':
+            form = UsuarioForm(request.POST)
+            if form.is_valid():
+                usuario = form.save()  # Crear solo la instancia de Usuario
+                return redirect('index')
+        else:
+            form = UsuarioForm()
 
-    usuarios = Usuario.objects.all()
-    return render(request, 'Registro.html', {'form': form, 'usuarios': usuarios})
-
-
+        usuarios = Usuario.objects.all()
+        return render(request, 'Registro.html', {'form': form, 'usuarios': usuarios})
 
 
-
-
-
-
-def eliminar_usuario(request, usuario_id):
-    usuario = get_object_or_404(Usuario, id=usuario_id)
+def eliminar_usuario(request,pk):
+    usuario = get_object_or_404(Usuario,pk=pk)
     usuario.delete()
     return redirect('index')
 
 
-
-
-
-
-
-
-
 def atender_usuario(request):
     # Obtener el primer ticket no atendido (FIFO)
-    usuario = Usuario.objects.order_by('fecha_registro').first()
+    usuario = Usuario.objects.all().first()
 
     if usuario:
         # Crear un registro en la tabla `UsuarioAtendido`
@@ -69,28 +95,13 @@ def atender_usuario(request):
             fecha_registro=usuario.fecha_registro,
         )
         usuario.delete()  # Eliminar el ticket original
-
     return redirect('index')
-
-
-
-
-
-
 
 def agregar_usuario_al_registro_diario(usuario_atendido):
     hoy = date.today()
     registro, creado = RegistroHoy.objects.get_or_create(fecha=hoy)
     registro.usuarios.add(usuario_atendido)  # Agregar `UsuarioAtendido` al registro diario
     registro.save()
-
-
-
-
-
-
-
-
 
 @csrf_exempt
 def ver_registros_diarios(request):
@@ -104,31 +115,18 @@ def ver_registros_diarios(request):
 
         return render(request, 'Registros.html', {'registros': registros,'usuarios_atendidos': usuarios_atendidos})
 
-
-
-
-
-
-
-
 @csrf_exempt
-def detalle_registro_diario(request, registro_id):
+def detalle_registro_diario(request,pk):
     # Obtener el registro diario específico
-    registro = get_object_or_404(RegistroHoy, id=registro_id)
+    registro = get_object_or_404(RegistroHoy,pk=pk)
     usuarios_atendidos = UsuarioAtendido.objects.all()
     return render(request, 'detalle_registro_diario.html', {'registro': registro, 'usuarios_atendidos': usuarios_atendidos})
 
-
-
-
-
-
-
 @csrf_exempt
-def descargas(request, registro_id):
+def descargas(request,pk):
     if request.method == 'POST':
         # Obtener el registro del día
-        registro = get_object_or_404(RegistroHoy, id=registro_id)
+        registro = get_object_or_404(RegistroHoy,pk=pk)
 
         # Filtrar usuarios atendidos por la fecha del registro
         usuarios_atendidos = UsuarioAtendido.objects.filter(fecha_registro=registro.fecha)
@@ -146,12 +144,6 @@ def descargas(request, registro_id):
             writer.writerow([usuario.nombre, usuario.cedula, usuario.edad, usuario.fecha_registro])
 
         return response
-
-
-
-
-
-
 
 @csrf_exempt
 def cargar_datos(request):
@@ -190,6 +182,16 @@ def cargar_datos(request):
         forms = CSVUploadForm()
 
     return render(request, 'cargar_csv.html', {'forms': forms})
+
+
+@csrf_exempt
+def buscar_usuario(request):
+    filtro = request.GET.get('filtro')  # Obtiene el campo de filtro del formulario
+    valor = request.GET.get('valor')    # Obtiene el valor a buscar
+    lista_nodos = iniciar_nodos()
+    resultados = lista_nodos.buscar(filtro, valor)
+
+    return render(request, 'Resultado_busqueda.html', {'resultados': resultados})
 
 
 

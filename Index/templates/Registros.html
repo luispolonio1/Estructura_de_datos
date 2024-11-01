@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registros Diarios</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
 <body  style="background-color:#1D1D1D;color: white">
@@ -15,7 +16,7 @@
 </form>
 <form method="POST" action="{% url 'carga_datos'%}" style="margin: 10px">
     {% csrf_token %}
-    <button type="submit" class="btn" style="background-color:#559;color: white">Cargar Archivo</button>
+    <button type="submit" class="btn" style="background-color:#559;color: white;display: flex;justify-content: center;align-items: center">Cargar Archivo<i class="material-icons" style="text-align: center">upload_file</i></button>
 </form>
 </div>
     <div class="container mt-4">
@@ -33,12 +34,12 @@
                 <tr>
                     <td>{{ registro.fecha }}</td>
                     <td>
-                      <a href="{% url 'detalle_registro_diario' registro.id %}" class="btn btn-primary">Ver Usuarios</a>
+                      <a href="{% url 'detalle_registro_diario' pk=registro.pk %}" class="btn btn-primary" style="text-align: center">Ver Usuarios</a>
                     </td>
                     <td>
-                        <form method="POST" action="{% url 'descargar_archivo' registro.id %}" style="display:inline;">
+                        <form method="POST" action="{% url 'descargar_archivo' pk=registro.pk %}" style="display:inline;">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-primary">Descargar</button>
+                        <button type="submit" class="btn btn-primary" style="display: flex;justify-content: center;align-items: center">Descargar<i class="material-icons" style="text-align: center">download</i></button>
                         </form>
                         </td>
                 </tr>

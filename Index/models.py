@@ -18,7 +18,7 @@ class UsuarioAtendido(models.Model):
     nombre = models.CharField(max_length=100)
     cedula = models.CharField(max_length=12,validators=[MinLengthValidator(8)])
     edad = models.IntegerField()
-    fecha_registro = models.DateField(default=datetime.now)
+    fecha_registro = models.DateField(default=datetime.now,)
 
     def __str__(self):
         return f"{self.nombre} - {self.cedula} - {self.edad}"
