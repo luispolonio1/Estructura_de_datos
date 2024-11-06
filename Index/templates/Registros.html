@@ -37,8 +37,7 @@
                       <a href="{% url 'detalle_registro_diario' pk=registro.pk %}" class="btn btn-primary" style="text-align: center">Ver Usuarios</a>
                     </td>
                     <td>
-                        <form method="POST" action="{% url 'descargar_archivo' pk=registro.pk %}" style="display:inline;">
-                        {% csrf_token %}
+                        <form method="GET" action="{% url 'descargar_archivo' pk=registro.pk %}" style="display:inline;">
                         <button type="submit" class="btn btn-primary" style="display: flex;justify-content: center;align-items: center">Descargar<i class="material-icons" style="text-align: center">download</i></button>
                         </form>
                         </td>

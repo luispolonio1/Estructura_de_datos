@@ -7,40 +7,42 @@
 </head>
 <body style="background-color:#1D1D1D;color:white;height:100vh">
 <div class="container mt-5">
-             <div class="text-center">
-                <h2>Registro de ticket</h2>
-            </div>
+    <div class="text-center">
+        <h2>Registro de ticket</h2>
+    </div>
+    
     <form method="POST" action="{% url 'guardar_usuario' %}">
         {% csrf_token %}
         {% load custom_filters %} <!-- Cargar el filtro personalizado -->
 
         <div class="mb-3">
             <label for="nombre" class="form-label">Nombre</label>
-            {{ form.nombre|add_class:"form-control" }} <!-- Agregar clase de Bootstrap -->
+            {{ form.nombre|add_class:"form-control" }}
         </div>
 
         <div class="mb-3">
             <label for="cedula" class="form-label">Cédula</label>
-            {{ form.cedula|add_class:"form-control" }} <!-- Agregar clase de Bootstrap -->
+            {{ form.cedula|add_class:"form-control" }}
         </div>
 
         <div class="mb-3">
             <label for="edad" class="form-label">Edad</label>
-            {{ form.edad|add_class:"form-control" }} <!-- Agregar clase de Bootstrap -->
+            {{ form.edad|add_class:"form-control" }}
         </div>
 
         <div class="mb-3">
             <label for="fecha_registro" class="form-label">Fecha</label>
-            {{ form.fecha_registro|add_class:"form-control" }} <!-- Agregar clase de Bootstrap -->
+            {{ form.fecha_registro|add_class:"form-control" }}
         </div>
 
         <button type="submit" class="btn btn-success">Guardar</button>
         <button type="reset" class="btn btn-secondary">Limpiar</button>
     </form>
-    <form method="POST" action="{% url 'index'%}" style="margin-top: 10px">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Cancelar</button>
-   </form>
+
+    <form method="POST" action="{% url 'index' %}" style="margin-top: 10px">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Volver</button>
+    </form>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
