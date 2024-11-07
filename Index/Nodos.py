@@ -40,7 +40,6 @@ class Lista_nodos:
     def buscar(self, filtro, valor):
         resultados = []
         actual = self.cabeza
-
         while actual is not None:
             # Accede a los atributos a través de actual.data
             if (filtro == "nombre" and actual.data.nombre == valor) or \

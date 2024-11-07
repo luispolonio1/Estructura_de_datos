@@ -11,4 +11,5 @@ urlpatterns = [
     path('descargar_archivo/<int:pk>/', views.descargas, name='descargar_archivo'),
     path('cargar_datos/',views.cargar_datos, name='carga_datos'),
     path('buscar/', views.buscar_usuario, name='buscar_usuario'),
+    path('descargar_noatendidos',views.descargas_Noatendidos, name='descargar_noatendidos'),
 ]
