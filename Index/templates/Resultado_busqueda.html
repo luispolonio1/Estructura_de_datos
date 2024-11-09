@@ -16,6 +16,7 @@
         <thead>
             <tr>
                 <th>Nombre</th>
+                <td>Apellido</td>
                 <th>Cédula</th>
                 <th>Edad</th>
                 <th>Número de Ticket</th>
@@ -27,9 +28,10 @@
                 {% for persona in resultados %}
                     <tr>
                         <td>{{ persona.nombre }}</td>
+                        <td>{{ persona.apellido }}</td>
                         <td>{{ persona.cedula }}</td>
                         <td>{{ persona.edad }}</td>
-                        <td>{{ forloop.counter }}</td>  <!-- Número de ticket basado en la posición en el bucle -->
+                        <td> # ticket {{ persona.id }}</td>  <!-- Número de ticket basado en la posición en el bucle -->
                         <td>{{ persona.fecha_registro }}</td>
                     </tr>
                 {% endfor %}

@@ -12,4 +12,5 @@ urlpatterns = [
     path('cargar_datos/',views.cargar_datos, name='carga_datos'),
     path('buscar/', views.buscar_usuario, name='buscar_usuario'),
     path('descargar_noatendidos',views.descargas_Noatendidos, name='descargar_noatendidos'),
+    path('reiniciar-ids/', views.reiniciar_ids, name='reiniciar_ids'),
 ]

@@ -4,6 +4,9 @@ from .models import Usuario,UsuarioAtendido,RegistroHoy
 from .forms import UsuarioForm ,CSVUploadForm
 from datetime import date,datetime
 from .Nodos import Lista_nodos
+from django.contrib import messages
+from django.db import connection
+from django.contrib.auth.decorators import login_required
 import csv
 
 
@@ -24,7 +27,7 @@ def index(request):
         lista_nodos_datos = lista_nodos.imprimir()
         lista_nodos_datos = merge_sort(lista_nodos_datos, criterio)
 
-        return render(request, 'Home.html',  {'lista_nodos_datos': lista_nodos_datos, 'ticket_actual': ticket_actual, 'criterio': criterio}) # haces la solicitud http , Renderizamos un template y enviamos los datos como contexto para poder visualizarlos en el HTML
+        return render(request, 'Home.html',  {'lista_nodos_datos': lista_nodos_datos, 'ticket_actual': ticket_actual, 'criterio': criterio})
 
 
 def merge_sort(data_list, criterio):
@@ -54,16 +57,32 @@ def merge(left, right, criterio):
     return sorted_list
 
 
+@login_required
+def reiniciar_ids(request):
+    if request.method == 'POST':
+        try:
+            tabla = Usuario._meta.db_table
+            Usuario.objects.all().delete()
+            with connection.cursor() as cursor:
+                if connection.vendor == 'sqlite':
+                    cursor.execute(f"DELETE FROM sqlite_sequence WHERE name='{tabla}'")
+        except Exception as e:
+            messages.error(request, f'Error al reiniciar los IDs: {str(e)}')
+
+        return redirect('index')
 
 def guardar_usuario(request):
-        if request.method == 'POST':
-            form = UsuarioForm(request.POST)
-            if form.is_valid():
-                form.save()
-                return redirect('index')
-        else:
-            form = UsuarioForm()
-        return render(request, 'Registro.html', {'form': form})
+    form = UsuarioForm()
+    if request.method == 'POST':
+        form = UsuarioForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Usuario guardado exitosamente")
+            return redirect('index')
+    else:
+        messages.warning(request, "Ocurrio un error , Por Favor Ingrese bien sus datos")
+
+    return render(request, 'Registro.html', {'form': form})
 
 
 def eliminar_usuario(request,pk):
@@ -78,6 +97,7 @@ def atender_usuario(request):
     if usuario:
         UsuarioAtendido.objects.create(
             nombre=usuario.nombre,
+            apellido=usuario.apellido,
             cedula=usuario.cedula,
             edad=usuario.edad,
             fecha_registro=usuario.fecha_registro,
@@ -109,9 +129,9 @@ def descargas(request,pk):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = f'attachment; filename="registro_{registro.fecha}.csv"'
         writer = csv.writer(response)
-        writer.writerow(['Nombre', 'Cédula', 'Edad', 'Fecha de Registro'])
+        writer.writerow(['Nombre','Apellido', 'Cédula', 'Edad', 'Fecha de Registro'])
         for usuario in usuarios_atendidos:
-            writer.writerow([usuario.nombre, usuario.cedula, usuario.edad, usuario.fecha_registro])
+            writer.writerow([usuario.nombre,usuario.apellido, usuario.cedula, usuario.edad, usuario.fecha_registro])
 
         return response
 
@@ -121,9 +141,9 @@ def descargas_Noatendidos(request):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = f'attachment; filename="registro_{date.today()}.csv"'
         writer = csv.writer(response)
-        writer.writerow(['Nombre', 'Cédula', 'Edad', 'Fecha de Registro'])
+        writer.writerow(['Nombre','Apellido', 'Cédula', 'Edad', 'Fecha de Registro'])
         for usuario in usuarios:
-            writer.writerow([usuario.nombre, usuario.cedula, usuario.edad, usuario.fecha_registro])
+            writer.writerow([usuario.nombre,usuario.apellido, usuario.cedula, usuario.edad, usuario.fecha_registro])
         return response
 
 def cargar_datos(request):
@@ -136,10 +156,11 @@ def cargar_datos(request):
                 reader = csv.reader(decoded_file)
                 header = next(reader)
                 for fila in reader:
-                    nombre, cedula, edad, fecha_registro = fila
+                    nombre,apellido, cedula, edad, fecha_registro = fila
                     fecha_registro = datetime.strptime(fecha_registro, '%Y-%m-%d').date()
                     usuario_atendido = UsuarioAtendido.objects.create(
                         nombre=nombre,
+                        apellido=apellido,
                         cedula='0' + cedula,
                         edad=int(edad),
                         fecha_registro=fecha_registro

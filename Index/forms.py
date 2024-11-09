@@ -40,6 +40,11 @@ class UsuarioForm(forms.ModelForm):
                 attrs={
                     'placeholder': 'Ingrese su Nombre',
                 }
+            ),
+            'apellido': forms.TextInput(
+                attrs={
+                    'placeholder': 'Ingrese su Apellido',
+                }
             )
         }
 
@@ -48,3 +53,10 @@ class UsuarioForm(forms.ModelForm):
         if not cedula.isdigit():
             raise forms.ValidationError("La cédula solo debe contener números.")
         return cedula
+
+    def clean_nombre_apellido(self):
+        nombre = self.cleaned_data.get('nombre')
+        apellido = self.cleaned_data.get('apellido')
+        if not nombre.isalpha() or not apellido.isupper():
+            raise forms.ValidationError("El nombre y apellido solo debe contener letras.")
+        return nombre,apellido

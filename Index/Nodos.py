@@ -42,7 +42,8 @@ class Lista_nodos:
         actual = self.cabeza
         while actual is not None:
             # Accede a los atributos a través de actual.data
-            if (filtro == "nombre" and actual.data.nombre == valor) or \
+            if (filtro == "nombre" and actual.data.nombre.lower() == valor.lower()) or \
+                    (filtro == "apellido" and actual.data.apellido.lower() == valor.lower()) or \
                     (filtro == "cedula" and actual.data.cedula == valor) or \
                     (filtro == "edad" and actual.data.edad == int(valor)):
                 resultados.append(actual.data)

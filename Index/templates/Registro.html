@@ -10,7 +10,11 @@
     <div class="text-center">
         <h2>Registro de ticket</h2>
     </div>
-    
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        Asegurate de Ingresar bien tus datos
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
     <form method="POST" action="{% url 'guardar_usuario' %}">
         {% csrf_token %}
         {% load custom_filters %} <!-- Cargar el filtro personalizado -->
@@ -19,7 +23,10 @@
             <label for="nombre" class="form-label">Nombre</label>
             {{ form.nombre|add_class:"form-control" }}
         </div>
-
+        <div class="mb-3">
+            <label for="apellido" class="form-label">Apellido</label>
+            {{ form.apellido|add_class:"form-control" }}
+        </div>
         <div class="mb-3">
             <label for="cedula" class="form-label">Cédula</label>
             {{ form.cedula|add_class:"form-control" }}
