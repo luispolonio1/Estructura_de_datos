@@ -14,6 +14,7 @@
             <thead>
                 <tr>
                     <th>Nombre</th>
+                    <td>Apellido</td>
                     <th>Cédula</th>
                     <th>Edad</th>
                     <th>Fecha</th>
@@ -24,6 +25,7 @@
                     {% if usuario.fecha_registro == registro.fecha %}
                 <tr>
                     <td>{{ usuario.nombre }}</td>
+                    <td>{{ usuario.apellido }}</td>
                     <td>{{ usuario.cedula }}</td>
                     <td>{{ usuario.edad }} Años</td>
                     <td>{{ usuario.fecha_registro }}</td>

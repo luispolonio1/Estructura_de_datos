@@ -54,9 +54,14 @@ class UsuarioForm(forms.ModelForm):
             raise forms.ValidationError("La cédula solo debe contener números.")
         return cedula
 
-    def clean_nombre_apellido(self):
+    def clean_nombre(self):
         nombre = self.cleaned_data.get('nombre')
+        if not nombre.isalpha():
+            raise forms.ValidationError("El nombre solo debe contener letras.")
+        return nombre
+
+    def clean_apellido(self):
         apellido = self.cleaned_data.get('apellido')
-        if not nombre.isalpha() or not apellido.isupper():
-            raise forms.ValidationError("El nombre y apellido solo debe contener letras.")
-        return nombre,apellido
+        if not apellido.isalpha():
+            raise forms.ValidationError("El apellido solo debe contener letras.")
+        return apellido
